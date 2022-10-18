@@ -18,4 +18,4 @@ function url_shortener() {
   return url
 }
 
-module.exports = urlShortener
+module.exports = url_shortener
