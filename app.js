@@ -3,6 +3,7 @@ const app = express()
 const port = 3000
 const exphbs = require('express-handlebars')
 const url_shortener = require('./url_shortener')
+const Urls = require('./models/urls')
 
 
 const mongoose = require('mongoose')
@@ -29,9 +30,16 @@ app.get('/', (req, res) => {
 app.post('/', (req, res) => {
   const input_url = req.body.input_url
   let output_url = url_shortener()
-  console.log(input_url)
-  console.log(output_url)
-  //redirect('/result')
+  return Urls.create([{ original_url: input_url, short_url: output_url }])
+    .then(() => {
+      console.log(input_url)
+      console.log(output_url)
+      res.render('result', { short_url: output_url })
+    })
+    .catch(error => {
+      console.log(error)
+      res.render('errorPage', { error: error.message })
+    })
 })
 
 app.get('/result', (req, res) => {
