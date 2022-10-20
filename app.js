@@ -29,17 +29,44 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
   const input_url = req.body.input_url
-  let output_url = url_shortener()
-  return Urls.create([{ original_url: input_url, short_url: output_url }])
-    .then(() => {
-      console.log(input_url)
-      console.log(output_url)
-      res.render('result', { short_url: output_url })
+  let output_url = ''
+  return Urls.find()
+    .lean()
+    .then((urls) => {
+      //check this url exist in db then show the db data
+      const aaa = urls.filter((data) => data.original_url.includes(input_url)).length
+      const bbb = url_shortener()
+      console.log(aaa, bbb)
+
+      if (urls.filter((data) => data.original_url.includes(input_url)).length) {
+        output_url = urls.filter((data) => data.original_url.includes(input_url))[0].short_url
+        console.log('AA', output_url)
+        return res.render('result', { short_url: output_url })
+      } else {
+        //Generate short url and check whether it is duplicated or not.
+        do {
+          output_url = url_shortener()
+          console.log('BB', output_url)
+        } while (urls.filter((data) => data.short_url.includes(output_url)).length)
+
+        //if it is a new url , generate a new short url
+        return Urls.create({ original_url: input_url, short_url: output_url })
+          .then(() => {
+            console.log('CC')
+            res.render('result', { short_url: output_url })
+          })
+          .catch(error => {
+            console.log(error)
+            res.render('errorPage', { error: error.message })
+          })
+
+      }
     })
     .catch(error => {
       console.log(error)
       res.render('errorPage', { error: error.message })
     })
+
 })
 
 app.get('/result', (req, res) => {
