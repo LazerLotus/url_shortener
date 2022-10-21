@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 const exphbs = require('express-handlebars')
 const url_shortener = require('./url_shortener')
 const Urls = require('./models/urls')
@@ -70,12 +70,31 @@ app.post('/', (req, res) => {
 
 })
 
-app.get('/result', (req, res) => {
-  res.render('result')
+app.get('/:link', (req, res) => {
+  const link = req.params.link
+  return Urls.find()
+    .lean()
+    .then((urls) => {
+      console.log(urls)
+      console.log(link)
+
+      if (urls.filter((data) => data.short_url.includes(link))) {
+        let original_url = urls.filter((data) => data.short_url.includes(link))[0].original_url
+        return res.redirect(302, `${original_url}`)
+      }
+
+
+    })
+    .catch(error => {
+      console.log(error)
+      res.render('errorPage', { error: error.message })
+    })
+
 })
 
 
-app.listen(port, () => {
-  console.log(`Express is listening on localhost:${port}`)
+let server = app.listen(port, () => {
+
+  console.log(`Express is listening on ${server.address().address}:${server.address().port}`)
 
 })
