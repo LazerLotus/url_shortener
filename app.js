@@ -36,7 +36,6 @@ app.post('/', (req, res) => {
     .lean()
     .then((urls) => {
       //check this url exist in db then show the db data
-      console.log(host)
       if (urls.filter((data) => data.original_url.includes(input_url)).length) {
         output_url = urls.filter((data) => data.original_url.includes(input_url))[0].short_url
         return res.render('result', { short_url: output_url, host: host })
@@ -66,17 +65,17 @@ app.post('/', (req, res) => {
 
 app.get('/:link', (req, res) => {
   const link = req.params.link
+
   return Urls.find()
     .lean()
     .then((urls) => {
-      console.log(urls)
-      console.log(link)
-
-      if (urls.filter((data) => data.short_url.includes(link))) {
+      if (urls.filter((data) => data.short_url.includes(link)).length !== 0) {
         let original_url = urls.filter((data) => data.short_url.includes(link))[0].original_url
         return res.redirect(302, `${original_url}`)
+      } else {
+        const host = req.get('host').toString()
+        res.render('noResult', { short_url: link, host: host })
       }
-      //todo: error page 
 
     })
     .catch(error => {
