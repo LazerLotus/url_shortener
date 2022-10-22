@@ -2,11 +2,11 @@
 This is a simple web to shorten url and share with shorter link with your friends!
 
 # Dependency
-express: 4.18.2
-express-handlebars: 4.0.2
-node.js: 14.16.0
-nodemon: 2.0.20
-mongoose: 5.9.7
+- express: 4.18.2
+- express-handlebars: 4.0.2
+- node.js: 14.16.0
+- nodemon: 2.0.20
+- mongoose: 5.9.7
 
 # Feature
 1. Url Shortener
